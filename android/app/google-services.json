@@ -1,0 +1,135 @@
+{
+  "project_info": {
+    "project_number": "57512780409",
+    "firebase_url": "https://shopapp-3ab85-default-rtdb.firebaseio.com",
+    "project_id": "shopapp-3ab85",
+    "storage_bucket": "shopapp-3ab85.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:57512780409:android:e0754e5a62751d9c23aaa8",
+        "android_client_info": {
+          "package_name": "com.example.deliverit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "57512780409-ogfbet4v96vof3nmnsujbn6m3bmbkc8t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.deliverit",
+            "certificate_hash": "b98ddbded97fa3cc946166880dde624c4105d0f0"
+          }
+        },
+        {
+          "client_id": "57512780409-g3vndkunbh23o5riiemmfocggetf6nk3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCv5HjqIjI97HebN4KkgBYFCmmP6pQayGE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "57512780409-celukqh54ns227bs2ducg7t971kd9lnq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "57512780409-abvh4dmpfmjnp44eak8dv57j947hohac.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.deliveryappdeliverit"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:57512780409:android:a56b986f8809330e23aaa8",
+        "android_client_info": {
+          "package_name": "com.example.deliveritapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "57512780409-obhl7d1p8jgsbptvags0131u4kknfsma.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.deliveritapplication",
+            "certificate_hash": "b98ddbded97fa3cc946166880dde624c4105d0f0"
+          }
+        },
+        {
+          "client_id": "57512780409-g3vndkunbh23o5riiemmfocggetf6nk3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCv5HjqIjI97HebN4KkgBYFCmmP6pQayGE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "57512780409-celukqh54ns227bs2ducg7t971kd9lnq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "57512780409-abvh4dmpfmjnp44eak8dv57j947hohac.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.deliveryappdeliverit"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:57512780409:android:195e12c00459532323aaa8",
+        "android_client_info": {
+          "package_name": "com.example.deliveryappdeliverit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "57512780409-g3vndkunbh23o5riiemmfocggetf6nk3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCv5HjqIjI97HebN4KkgBYFCmmP6pQayGE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "57512780409-celukqh54ns227bs2ducg7t971kd9lnq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "57512780409-abvh4dmpfmjnp44eak8dv57j947hohac.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.deliveryappdeliverit"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
