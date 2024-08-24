@@ -21,9 +21,11 @@ class AddressScreen extends StatefulWidget {
 
 class _AddressScreenState extends State<AddressScreen> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _postalCodeController = TextEditingController();
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   String _selectedProvince = '';
+  bool _isEditing = false;
 
   final List<String> _provinceOptions = [
     'Bahria Phase 1-4',
@@ -34,8 +36,6 @@ class _AddressScreenState extends State<AddressScreen> {
     'Chaklala',
     'Pwd'
   ];
-
-  bool _isEditing = false; // Toggle for edit mode
 
   @override
   void initState() {
@@ -64,6 +64,7 @@ class _AddressScreenState extends State<AddressScreen> {
         final data = addressDoc.data() as Map<String, dynamic>?;
 
         setState(() {
+
           _mobileController.text =
               data?['Mobile Number'] ?? _mobileController.text;
           _addressController.text = data?['Address'] ?? _addressController.text;
@@ -83,22 +84,24 @@ class _AddressScreenState extends State<AddressScreen> {
               .doc(user.email)
               .set({
             'Email': user.email ?? 'Unknown',
+
             'Mobile Number': _mobileController.text,
             'Address': _addressController.text,
             'Area': _selectedProvince,
           });
 
           final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('postalCode', _postalCodeController.text);
           await prefs.setString('mobileNumber', _mobileController.text);
           await prefs.setString('address', _addressController.text);
           await prefs.setString('province', _selectedProvince);
 
           setState(() {
-            _isEditing = false; // Exit edit mode after saving
+            _isEditing = false; // Return to view mode after saving
           });
 
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Address saved successfully!')),
+            SnackBar(content: Text('Address updated successfully!')),
           );
         } catch (e) {
           print('Error saving address: $e');
@@ -107,243 +110,241 @@ class _AddressScreenState extends State<AddressScreen> {
           );
         }
       }
+    } else {
+      print('No user is currently signed in.');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please sign in to save address.')),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          title: Text(
-            'Address',
-            style: TextStyle(
-              fontFamily: 'Kanit', fontSize: 22, letterSpacing: 0.5,
-            ),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        title: Text(
+          'Address',
+          style: TextStyle(fontFamily: 'Kanit', fontSize: 22, letterSpacing: 0.5),
+        ),
+        actions: [],
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0.w),
+        child: _isEditing ? _buildEditForm() : _buildAddressView(),
+      ),
+    );
+  }
+
+  Widget _buildAddressView() {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        vertical: 40.0.h, // Adjust vertical padding to move the card down
+        horizontal: 16.0.w, // Optional: Horizontal padding for spacing from edges
+      ),
+      child: Card(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(2.0), // Slightly rounded corners
+        ),
+        elevation: 1.5,
+        child: SizedBox(
+          height: 120.h, // Set a fixed height for the Card
+          child: ListView(
+            padding: EdgeInsets.all(12.0.w), // Padding inside the ListView
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _addressController.text,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15.sp,
+                            fontFamily: 'Montserrat',
+                          ),
+                        ),
+                        SizedBox(height: 5.h), // Space between text elements
+                        Text(
+                          _mobileController.text,
+                          style: TextStyle(fontFamily: 'Montserrat'),
+                        ),
+                        Text(
+                          _selectedProvince,
+                          style: TextStyle(fontFamily: 'Montserrat'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.edit, color: Colors.blueGrey),
+                    onPressed: () {
+                      setState(() {
+                        _isEditing = true; // Toggle to edit mode when the icon is clicked
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-        body: Padding(
-          padding: EdgeInsets.all(16.0.w),
-          child: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Card(
-                      color: Colors.white,
-                      elevation: 1.5,
+      ),
+    );
+  }
+
+  Widget _buildEditForm() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return SingleChildScrollView(
+      child: Container(
+        height: screenHeight * 0.7, // Adjust height to fit the screen if needed
+        padding: EdgeInsets.all(16.0.w), // Padding inside the Container
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(2.0), // Rounded corners
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              blurRadius: 2,
+              offset: Offset(0, 2), // Shadow position
+            ),
+          ],
+        ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Postal Code Field
+         // Space between fields
+
+              // Mobile Number Field
+              TextFormField(
+                controller: _mobileController,
+                decoration: InputDecoration(
+                  labelText: 'Mobile Number',
+                  labelStyle: TextStyle(color: Colors.grey[700]), // Label text color
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blueGrey), // Underline color
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blueGrey), // Underline color
+                  ),
+                ),
+                keyboardType: TextInputType.phone,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter mobile number';
+                  }
+                  return null;
+                },
+                cursorColor: Colors.blueGrey, // Cursor color
+                style: TextStyle(fontFamily: 'Montserrat'), // Font family
+              ),
+              SizedBox(height: 16.h), // Space between fields
+
+              // Address Field
+              TextFormField(
+                controller: _addressController,
+                decoration: InputDecoration(
+                  labelText: 'Address',
+                  labelStyle: TextStyle(color: Colors.grey[700]), // Label text color
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blueGrey), // Underline color
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blueGrey), // Underline color
+                  ),
+                ),
+                maxLines: 3,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter address';
+                  }
+                  return null;
+                },
+                cursorColor: Colors.blueGrey, // Cursor color
+                style: TextStyle(fontFamily: 'Montserrat'), // Font family
+              ),
+              SizedBox(height: 16.h), // Space between fields
+
+              // Province Dropdown
+              DropdownButtonFormField<String>(
+                value: _selectedProvince.isEmpty ? null : _selectedProvince,
+                decoration: InputDecoration(
+                  labelText: 'Province',
+                  labelStyle: TextStyle(color: Colors.grey[700]), // Label text color
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blueGrey), // Underline color
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blueGrey), // Underline color
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedProvince = value!;
+                  });
+                },
+                items: _provinceOptions.map((province) {
+                  return DropdownMenuItem(
+                    value: province,
+                    child: Text(province, style: TextStyle(fontFamily: 'Montserrat')),
+                  );
+                }).toList(),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select area';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 90.h), // Space before the save button
+
+              // Save Button
+              SizedBox(
+                width: double.infinity,
+
+                // Full-width button
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _saveAddress,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFB3C6D1),
+                      padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0.0), // Square corners
+                        borderRadius: BorderRadius.circular(2.0),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ListTile(
-                            title: _isEditing
-                                ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                TextFormField(
-                                  controller: _addressController,
-                                  keyboardType: TextInputType.text,
-                                  maxLines: 3,
-                                  decoration: InputDecoration(
-                                    hintText: 'Enter your Address',
-                                    hintStyle: TextStyle(
-                                      fontSize: 12.0, // Adjust font size
-                                      color: Colors.grey,
-                                      fontFamily: 'Montserrat',
-                                    ),
-                                    enabledBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    focusedBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ),
-                                  cursorColor: Colors.grey,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter address';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                TextFormField(
-                                  controller: _mobileController,
-                                  keyboardType: TextInputType.phone,
-                                  decoration: InputDecoration(
-                                    hintText: 'Enter your mobile number',
-                                    hintStyle: TextStyle(
-                                      fontSize: 12.0, // Adjust font size
-                                      color: Colors.grey,
-                                      fontFamily: 'Montserrat',
-                                    ),
-                                    enabledBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    focusedBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ),
-                                  cursorColor: Colors.grey,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter mobile number';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                SizedBox(height: 8.0), // Spacing between fields
-                                DropdownButtonFormField<String>(
-                                  value: _provinceOptions
-                                      .contains(_selectedProvince)
-                                      ? _selectedProvince
-                                      : null,
-                                  items: _provinceOptions.map((province) {
-                                    return DropdownMenuItem<String>(
-                                      value: province,
-                                      child: Text(province),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedProvince = value ?? '';
-                                    });
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: 'Select your area',
-                                    hintStyle: TextStyle(
-                                      fontSize: 12.0, // Adjust font size
-                                      color: Colors.grey,
-                                      fontFamily: 'Montserrat',
-                                    ),
-                                    enabledBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    focusedBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    fillColor: Colors.white,
-                                    filled: true,
-                                  ),
-                                  dropdownColor: Colors.white,
-                                ),
-                              ],
-                            )
-                                : Card(
-                              color: Colors.white,
-                              elevation: 1.5,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(0.0),
-                              ),
-                              child: ListTile(
-                                contentPadding: EdgeInsets.all(10.0.w),
-                                leading: Icon(Icons.location_on,
-                                    color: Colors.blue),
-                                title: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${_addressController.text}',
-                                      style: TextStyle(
-                                          fontFamily: 'Montserrat',
-                                          fontSize: 15),
-                                    ),
-                                    Text('$_selectedProvince',
-                                        style: TextStyle(
-                                            fontFamily: 'Montserrat',
-                                            fontSize: 15)),
-                                    Text(
-                                      '${_mobileController.text}',
-                                      style: TextStyle(
-                                          fontFamily: 'Montserrat',
-                                          fontSize: 15),
-                                    ),
-                                  ],
-                                ),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(_isEditing
-                                          ? Icons.check
-                                          : Icons.edit),
-                                      onPressed: () {
-                                        if (_isEditing) {
-                                          if (_formKey.currentState
-                                              ?.validate() ??
-                                              false) {
-                                            _saveAddress();
-                                          } else {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                  content: Text(
-                                                      'Please correct the errors in the form.')),
-                                            );
-                                          }
-                                        } else {
-                                          setState(() {
-                                            _isEditing = true;
-                                          });
-                                        }
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          if (_isEditing) // Only show save button in edit mode
-                            Center(
-                              child: SizedBox(
-                                width: 280.0,
-                                height: 50,
-                                child: ElevatedButton(
-                                  onPressed: _saveAddress,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xFFB3C6D1),
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: screenHeight * 0.02),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(2.0),
-                                    ),
-                                    elevation: 1.0,
-                                  ),
-                                  child: Text(
-                                    'Save ',
-                                    style: TextStyle(
-                                        fontSize: 18.0,
-                                        color: Colors.white,
-                                        fontFamily: 'Montserrat',
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
+                      elevation: 1.0,
+                    ),
+                    child: Text(
+                      'Save',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.045,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontFamily: 'Montserrat',
                       ),
                     ),
-                  ]),
-            ),
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 10.h), // Space after the button
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }
