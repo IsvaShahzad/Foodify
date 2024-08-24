@@ -29,6 +29,7 @@ class _MainScreenState extends State<MainScreen> {
       FirebaseFirestore.instance.collection('categories');
   String _searchQuery = '';
   String userAddress = '';
+  String userArea = '';
 
   @override
   void initState() {
@@ -78,6 +79,7 @@ class _MainScreenState extends State<MainScreen> {
         print('Fetched Address Details: ${addressDoc.data()}');
         setState(() {
           userAddress = addressDoc['Address'] ?? 'No address available';
+          userArea = addressDoc['Area'] ?? 'No area';
         });
       } else {
         print('Address document does not exist.');
@@ -165,7 +167,7 @@ class _MainScreenState extends State<MainScreen> {
                   height: 5,
                 ),
                 Text(
-                  '$userAddress',
+                  '${userAddress}, ${userArea}',
                   style: TextStyle(
                     fontFamily: 'Montserrat',
                     fontSize: 14,

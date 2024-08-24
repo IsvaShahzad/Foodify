@@ -18,12 +18,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
   String userEmail = 'user@example.com';
   String userAddress = '';
   String userArea = '';
+  List<Map<String, dynamic>> orderItems = []; // List to hold the order items
 
   @override
   void initState() {
     super.initState();
     _fetchUserDetails();
     _fetchUserAddress();
+    _fetchOrderItems(); // Fetch the order items when initializing
   }
 
   Future<void> _fetchUserDetails() async {
@@ -35,16 +37,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
           .get();
 
       if (userDoc.exists) {
-        print('Fetched User Details: ${userDoc.data()}');
         setState(() {
           userFirstName = userDoc['firstname'] ?? 'User';
           userEmail = user.email ?? 'user@example.com';
         });
-      } else {
-        print('User document does not exist.');
       }
-    } else {
-      print('No current user.');
     }
   }
 
@@ -57,36 +54,41 @@ class _PaymentScreenState extends State<PaymentScreen> {
           .get();
 
       if (addressDoc.exists) {
-        print('Fetched Address Details: ${addressDoc.data()}');
         setState(() {
           userAddress = addressDoc['Address'] ?? 'No address available';
           userArea = addressDoc['Area'] ?? 'No area available';
         });
-      } else {
-        print('Address document does not exist.');
       }
-    } else {
-      print('No current user.');
     }
   }
 
-  Future<void> updateUserDetails() async {
+  Future<void> _fetchOrderItems() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       try {
-        await FirebaseFirestore.instance
-            .collection('users')
+        final QuerySnapshot ordersSnapshot = await FirebaseFirestore.instance
+            .collection('cartitems')
             .doc(user.email)
-            .update({
-          'firstname': userFirstName,
-          'email': userEmail,
+            .collection('orders')
+            .orderBy('Timestamp', descending: true) // Order by most recent
+            .limit(1) // Fetch only the most recent item
+            .get();
+
+        List<Map<String, dynamic>> fetchedItems = [];
+        for (var doc in ordersSnapshot.docs) {
+          final orderData = doc.data() as Map<String, dynamic>;
+          if (orderData != null) {
+            fetchedItems.add(orderData);
+            // Print fetched cart items to the terminal
+            print('Fetched Order Item: ${orderData}');
+          }
+        }
+        setState(() {
+          orderItems = fetchedItems;
         });
-        print('User details updated successfully.');
       } catch (e) {
-        print('Error updating user details: $e');
+        print('Error fetching order items: $e');
       }
-    } else {
-      print('No current user.');
     }
   }
 
@@ -129,20 +131,46 @@ class _PaymentScreenState extends State<PaymentScreen> {
         },
       );
     } else {
-      // Add order details to Firestore
       try {
-        final email =
-            FirebaseAuth.instance.currentUser?.email ?? 'unknown@example.com';
-        final cartDocRef =
-            FirebaseFirestore.instance.collection('cartitems').doc(email);
+        final email = FirebaseAuth.instance.currentUser?.email ?? 'unknown@example.com';
 
-        // Add order details to Firestore
-        await FirebaseFirestore.instance.collection('orders').add({
+        // Reference to the user's document in the 'cartitems' collection
+        final userDocRef = FirebaseFirestore.instance.collection('cartitems').doc(email);
+
+        // Reference to the 'orders' subcollection for the user
+        final ordersCollectionRef = userDocRef.collection('orders');
+
+        // Fetch the most recent order document
+        final ordersQuery = await ordersCollectionRef.orderBy('Timestamp', descending: true).limit(1).get();
+
+        List<Map<String, dynamic>> items = [];
+
+        for (var doc in ordersQuery.docs) {
+          final orderData = doc.data();
+          if (orderData != null) {
+            items.add(orderData);
+          }
+        }
+
+        // Reference to the user's document in the 'finalorder' collection
+        final finalOrderDocRef = FirebaseFirestore.instance.collection('finalorder').doc(email);
+
+        // Store the order details including cart items in the user's document
+        await finalOrderDocRef.collection('orders').add({
           'username': userFirstName,
           'email': userEmail,
           'status': 'Order Confirmed',
           'timestamp': FieldValue.serverTimestamp(),
+          'items': items, // Save cart items in the new order
         });
+
+        // Optionally, clear the cart items
+        for (var doc in ordersQuery.docs) {
+          await doc.reference.delete();
+        }
+
+        // Fetch and display the most recent order items again
+        await _fetchOrderItems();
 
         // Navigate to DeliveredScreen
         Navigator.pushReplacement(
@@ -163,135 +191,157 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 20),
-          Row(
-            children: [
-              IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              Text(
-                'Payment',
-                style: TextStyle(
-                  fontSize: screenWidth * 0.06,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Montserrat',
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 10),
-          ProgressBarShipping(
-            steps: ['Menu', 'Cart', 'Payment'],
-            currentIndex: 1, // Adjust this based on the current step
-          ),
-          SizedBox(height: 5),
-          Card(
-            color: Colors.white,
-            margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-            elevation: 1.5,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(2.0),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      body: SingleChildScrollView( // Make the screen scrollable
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 20),
+            Row(
               children: [
-                Container(
-                  padding: EdgeInsets.all(8), // Reduced padding
-                  child: Text(
-                    'Delivery Address',
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.05,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Montserrat',
-                    ),
-                  ),
+                IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
                 ),
-                MapWidget(),
-                Padding(
-                  padding: const EdgeInsets.all(8.0), // Reduced padding
-                  child: Text(
-                    '${userAddress}, ${userArea}', // Concatenate address and area
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.045,
-                      fontFamily: 'Montserrat',
-                      color: Colors.black87,
-                    ),
+                Text(
+                  'Payment',
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.06,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Montserrat',
                   ),
-                ),
-                Divider(),
-                ListTile(
-                  contentPadding: EdgeInsets.symmetric(
-                      horizontal: 8.0,
-                      vertical: 6), // Adjust horizontal padding
-                  leading: Checkbox(
-                    value: isCheckboxChecked,
-                    onChanged: (value) {
-                      setState(() {
-                        isCheckboxChecked = value!;
-                      });
-                    },
-                  ),
-                  title: Text(
-                    'Cash on Delivery',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'Montserrat',
-                      fontSize: screenWidth * 0.045,
-                    ),
-                  ),
-                  dense: true, // Reduce vertical space
                 ),
               ],
             ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
+            SizedBox(height: 10),
+            ProgressBarShipping(
+              steps: ['Menu', 'Cart', 'Payment'],
+              currentIndex: 1, // Adjust this based on the current step
+            ),
+            SizedBox(height: 5),
+            Card(
+              color: Colors.white,
+              margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+              elevation: 1.5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(2.0),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: screenHeight * 0.08),
-
-
-                  Align(
-                    alignment: Alignment.center,
-                    child: SizedBox(
-                      width: 320,
-                      child: ElevatedButton(
-                        onPressed: placeOrder,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFFB3C6D1),
-                          padding: EdgeInsets.symmetric(
-                              vertical: screenHeight * 0.02),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(2.0),
-                          ),
-                          elevation: 1.0,
-                        ),
-                        child: Text(
-                          'Place Order',
-                          style: TextStyle(
-                            fontSize: screenWidth * 0.045,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontFamily: 'Montserrat',
-                          ),
-                        ),
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    child: Text(
+                      'Delivery Address',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.05,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Montserrat',
                       ),
                     ),
                   ),
-                  SizedBox(height: screenHeight * 0.05),
+                  MapWidget(),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      '${userAddress}, ${userArea}',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.045,
+                        fontFamily: 'Montserrat',
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                  Divider(),
+                  ListTile(
+                    contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 6),
+                    leading: Checkbox(
+                      value: isCheckboxChecked,
+                      onChanged: (value) {
+                        setState(() {
+                          isCheckboxChecked = value!;
+                        });
+                      },
+                    ),
+                    title: Text(
+                      'Cash on Delivery',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'Montserrat',
+                        fontSize: screenWidth * 0.045,
+                      ),
+                    ),
+                    dense: true,
+                  ),
                 ],
               ),
             ),
-          ),
-        ],
+            SizedBox(height: 10), // Add space between cards
+            Card(
+              color: Colors.white,
+              margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+              elevation: 1.5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(2.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    child: Text(
+                      'Order Summary',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.05,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Montserrat',
+                      ),
+                    ),
+                  ),
+                  Divider(),
+                  ...orderItems.map((order) {
+                    final items = List<Map<String, dynamic>>.from(order['Items'] ?? []);
+                    return Column(
+                      children: items.map((item) {
+                        return ListTile(
+                          contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 6),
+                          leading: Image.network(
+                            item['Image URL'] ?? '', // Provide a default value
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                          ),
+                          title: Text(item['Item Name'] ?? 'Unknown Item'),
+                          subtitle: Text('Quantity: ${item['Quantity'] ?? 0}'),
+                          trailing: Text('Rs. ${item['Price']?.toStringAsFixed(2) ?? '0.00'}'),
+                        );
+                      }).toList(),
+                    );
+                  }).toList(),
+                ],
+              ),
+            ),
+            SizedBox(height: screenHeight * 0.08),
+            Align(
+              alignment: Alignment.center,
+              child: SizedBox(
+                width: screenWidth * 0.9,
+                child: ElevatedButton(
+                  onPressed: placeOrder,
+                  child: Text(
+                    'Place Order',
+                    style: TextStyle(
+                      fontFamily: 'Montserrat',
+                      fontSize: screenWidth * 0.05,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: screenHeight * 0.02),
+          ],
+        ),
       ),
     );
   }
