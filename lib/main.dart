@@ -47,8 +47,8 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
 
             theme: ThemeData(
-              scaffoldBackgroundColor:  Color(0xffffa7a6),
-              primarySwatch: Colors.purple,
+              scaffoldBackgroundColor:  Colors.blueGrey,
+              primarySwatch: Colors.blueGrey,
               // accentColor: Colors.pink,
               inputDecorationTheme: const InputDecorationTheme(
                 // enabledBorder: OutlineInputBorder(
@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
                 // ),
               ),
             ),
-            home: SplashScreen(),
+            home: MainScreen(),
             debugShowCheckedModeBanner: false,
           );
         },

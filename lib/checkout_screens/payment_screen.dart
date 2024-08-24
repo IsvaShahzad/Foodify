@@ -19,7 +19,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
   String userAddress = '';
   String userArea = '';
 
-
   @override
   void initState() {
     super.initState();
@@ -62,7 +61,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
         setState(() {
           userAddress = addressDoc['Address'] ?? 'No address available';
           userArea = addressDoc['Area'] ?? 'No area available';
-
         });
       } else {
         print('Address document does not exist.');
@@ -98,6 +96,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+            backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(2.0),
             ),
@@ -122,8 +121,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 child: Text(
                   'OK',
                   style: TextStyle(
-                    fontFamily: 'Montserrat',
-                  ),
+                      fontFamily: 'Montserrat', color: Colors.blueGrey),
                 ),
               ),
             ],
@@ -133,8 +131,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
     } else {
       // Add order details to Firestore
       try {
-        final email = FirebaseAuth.instance.currentUser?.email ?? 'unknown@example.com';
-        final cartDocRef = FirebaseFirestore.instance.collection('cartitems').doc(email);
+        final email =
+            FirebaseAuth.instance.currentUser?.email ?? 'unknown@example.com';
+        final cartDocRef =
+            FirebaseFirestore.instance.collection('cartitems').doc(email);
 
         // Add order details to Firestore
         await FirebaseFirestore.instance.collection('orders').add({
@@ -147,7 +147,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
         // Navigate to DeliveredScreen
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (BuildContext context) => DeliveredScreen()),
+          MaterialPageRoute(
+              builder: (BuildContext context) => DeliveredScreen()),
         );
       } catch (e) {
         print('Error adding order to Firestore: $e');
@@ -189,19 +190,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
             steps: ['Menu', 'Cart', 'Payment'],
             currentIndex: 1, // Adjust this based on the current step
           ),
-          SizedBox(height: 10),
+          SizedBox(height: 5),
           Card(
-            margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-            elevation: 4.0,
+            color: Colors.white,
+            margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+            elevation: 1.5,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(2.0),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: EdgeInsets.all(10),
-                  color: Colors.grey[200],
+                  padding: EdgeInsets.all(8), // Reduced padding
                   child: Text(
                     'Delivery Address',
                     style: TextStyle(
@@ -213,7 +214,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
                 MapWidget(),
                 Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.all(8.0), // Reduced padding
                   child: Text(
                     '${userAddress}, ${userArea}', // Concatenate address and area
                     style: TextStyle(
@@ -222,66 +223,52 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       color: Colors.black87,
                     ),
                   ),
-
+                ),
+                Divider(),
+                ListTile(
+                  contentPadding: EdgeInsets.symmetric(
+                      horizontal: 8.0,
+                      vertical: 6), // Adjust horizontal padding
+                  leading: Checkbox(
+                    value: isCheckboxChecked,
+                    onChanged: (value) {
+                      setState(() {
+                        isCheckboxChecked = value!;
+                      });
+                    },
+                  ),
+                  title: Text(
+                    'Cash on Delivery',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontFamily: 'Montserrat',
+                      fontSize: screenWidth * 0.045,
+                    ),
+                  ),
+                  dense: true, // Reduce vertical space
                 ),
               ],
             ),
           ),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: screenHeight * 0.05),
-                  Card(
-                    color: Colors.white,
-                    elevation: 1.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(2.0),
-                    ),
-                    child: ListTile(
-                      leading: Checkbox(
-                        value: isCheckboxChecked,
-                        onChanged: (value) {
-                          setState(() {
-                            isCheckboxChecked = value!;
-                          });
-                        },
-                      ),
-                      title: Text(
-                        'Cash on Delivery',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontFamily: 'Montserrat',
-                          fontSize: screenWidth * 0.045,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.02),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      '*Parcel delivered to your door. Tip the rider!*',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.035,
-                        color: Colors.blueGrey,
-                        fontFamily: 'Montserrat',
-                      ),
-                    ),
-                  ),
-                  Spacer(),
+                  SizedBox(height: screenHeight * 0.08),
+
+
                   Align(
                     alignment: Alignment.center,
                     child: SizedBox(
-                      width: double.infinity,
+                      width: 320,
                       child: ElevatedButton(
                         onPressed: placeOrder,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFFB3C6D1),
-                          padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
+                          padding: EdgeInsets.symmetric(
+                              vertical: screenHeight * 0.02),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(2.0),
                           ),

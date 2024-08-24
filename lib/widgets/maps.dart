@@ -7,11 +7,10 @@ class MapWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // Coordinates for Islamabad
-    final islamabadLocation = LatLng(33.6844, 73.0479);
+    final rawalpindiLocation = LatLng(33.6007, 73.0678);
 
     return Container(
-      height: screenHeight * 0.45, // Adjust height as needed
+      height: screenHeight * 0.33, // Adjust height as needed
       child: FlutterMap(
         options: MapOptions(
           initialCenter: LatLng(30.3753, 69.3451), // Center of the map around Pakistan
@@ -34,7 +33,7 @@ class MapWidget extends StatelessWidget {
           MarkerLayer(
             markers: [
               Marker(
-                point: islamabadLocation,
+                point: rawalpindiLocation,
                 child: Icon(
                   Icons.location_on,
                   color: Colors.red,
