@@ -189,7 +189,7 @@ class MapScreenState extends State<Profile>
                                             'Personal Information',
                                             style: TextStyle(
                                                 fontSize: 22.0,
-                                                fontWeight: FontWeight.bold,
+                                                // fontWeight: FontWeight.bold,
                                                 color: Colors.black,
                                                 fontFamily: 'Montserrat'),
                                           ),
@@ -222,7 +222,7 @@ class MapScreenState extends State<Profile>
                                             'Name',
                                             style: TextStyle(
                                                 fontSize: 16.0,
-                                                fontWeight: FontWeight.bold,
+                                                // fontWeight: FontWeight.bold,
                                                 color: Colors.black,
                                                 fontFamily: 'Montserrat'),
                                           ),
@@ -242,8 +242,11 @@ class MapScreenState extends State<Profile>
                                           decoration: const InputDecoration(
                                             hintText: "Enter Your Name",
                                             hintStyle: TextStyle(
-                                              color: Colors.grey, // Change this to your desired color
+                                              color: Color(0xFFB0BEC5), // Custom grey color
                                               fontSize: 14,       // You can also adjust the font size if needed
+                                            ),
+                                            labelStyle: TextStyle(
+                                              color: Colors.black, // Dark color for text
                                             ),
                                           ),
 
@@ -276,7 +279,7 @@ class MapScreenState extends State<Profile>
                                             'Email ID',
                                             style: TextStyle(
                                                 fontSize: 16.0,
-                                                fontWeight: FontWeight.bold,
+                                                // fontWeight: FontWeight.bold,
                                                 color: Colors.black,
                                                 fontFamily: 'Montserrat'),
                                           ),
@@ -296,9 +299,12 @@ class MapScreenState extends State<Profile>
                                           decoration: const InputDecoration(
                                               hintText: "Enter Email ID",
                                             hintStyle: TextStyle(
-                                              color: Colors.grey, // Change this to your desired color
+                                              color: Color(0xFFB0BEC5), // Custom grey color
                                               fontSize: 14,       // You can also adjust the font size if needed
                                             ),
+
+
+
 
                                           ),
                                           textInputAction: TextInputAction.next,
@@ -329,7 +335,7 @@ class MapScreenState extends State<Profile>
                                             'Mobile',
                                             style: TextStyle(
                                                 fontSize: 16.0,
-                                                fontWeight: FontWeight.bold,
+                                                // fontWeight: FontWeight.bold,
                                                 color: Colors.black,
                                                 fontFamily: 'Montserrat'),
                                           ),
@@ -350,10 +356,13 @@ class MapScreenState extends State<Profile>
                                           decoration: const InputDecoration(
                                               hintText: "Enter Mobile Number",
                                             hintStyle: TextStyle(
-                                              color: Colors.grey, // Change this to your desired color
-                                              fontSize: 14,       // You can also adjust the font size if needed
+                                              color: Color(0xFFB0BEC5), // Custom grey color
+                                              fontSize: 14,
+                                              // You can also adjust the font size if needed
                                             ),
+
                                           ),
+
                                           textInputAction: TextInputAction.next,
                                           enabled: !_status,
                                           validator: (value) {
@@ -380,7 +389,7 @@ class MapScreenState extends State<Profile>
                                             'Pin Code',
                                             style: TextStyle(
                                                 fontSize: 16.0,
-                                                fontWeight: FontWeight.bold,
+                                                // fontWeight: FontWeight.bold,
                                                 color: Colors.black,
                                                 fontFamily: 'Montserrat'),
                                           ),
@@ -419,7 +428,7 @@ class MapScreenState extends State<Profile>
                                             decoration: const InputDecoration(
                                                 hintText: "Enter Pin Code",
                                               hintStyle: TextStyle(
-                                                color: Colors.grey, // Change this to your desired color
+                                                color: Color(0xFFB0BEC5), // Custom grey color
                                                 fontSize: 14,       // You can also adjust the font size if needed
                                               ),
                                             ),
@@ -438,23 +447,7 @@ class MapScreenState extends State<Profile>
                                         ),
                                         flex: 2,
                                       ),
-                                      // Flexible(
-                                      //   child: new TextFormField(
-                                      //     controller: StateController,
-                                      //     decoration: const InputDecoration(
-                                      //       hintText: "Enter State",
-                                      //     ),
-                                      //     enabled: !_status,
-                                      //     validator: (value) {
-                                      //       if (value!.isEmpty) {
-                                      //         return 'Please enter your name';
-                                      //       }
-                                      //       return null;
-                                      //     },
-                                      //     onSaved: (value) => _state = value!,
-                                      //   ),
-                                      //   flex: 2,
-                                      // ),
+
                                     ],
                                   )),
                               !_status ? _getActionButtons() : new Container(),
@@ -471,12 +464,6 @@ class MapScreenState extends State<Profile>
     );
   }
 
-  // @override
-  // void dispose() {
-  //   // Clean up the controller when the Widget is disposed
-  //   myFocusNode.dispose();
-  //   super.dispose();
-  // }
 
   Widget _getActionButtons() {
     return Padding(

@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:provider/provider.dart';
+import 'package:shop/order_history/order_history.dart';
 import 'package:shop/screens/favourites.dart';
 import 'package:shop/screens/mainscreen.dart';
 import 'package:shop/screens/splash_screen.dart';
@@ -61,7 +62,7 @@ class MyApp extends StatelessWidget {
                 // ),
               ),
             ),
-            home: SplashScreen(),
+            home: OrderHistoryScreen(),
             debugShowCheckedModeBanner: false,
           );
         },

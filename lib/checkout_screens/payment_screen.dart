@@ -94,6 +94,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   Future<void> placeOrder() async {
     if (!isCheckboxChecked) {
+      // Show an error dialog if the checkbox is not checked
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -132,6 +133,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       );
     } else {
       try {
+        // Get the current user's email
         final email = FirebaseAuth.instance.currentUser?.email ?? 'unknown@example.com';
 
         // Reference to the user's document in the 'cartitems' collection
@@ -145,26 +147,40 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
         List<Map<String, dynamic>> items = [];
 
+        // Collect the items from the fetched order
         for (var doc in ordersQuery.docs) {
           final orderData = doc.data();
-          if (orderData != null) {
-            items.add(orderData);
+          if (orderData != null && orderData.containsKey('Items')) {
+            // Fetch the product information directly from 'Items' and store it in the items list
+            final List<Map<String, dynamic>> fetchedItems = List<Map<String, dynamic>>.from(orderData['Items']);
+            items.addAll(fetchedItems);
           }
         }
+
+        // Calculate the total price of the items
+        double total = 0.0;
+        items.forEach((item) {
+          double price = item['Price'] ?? 0.0;
+          total += price; // Add only the product price
+        });
+
+// Add 100 to the total bill
+        total += 100; // Add 100 only once to the total
 
         // Reference to the user's document in the 'finalorder' collection
         final finalOrderDocRef = FirebaseFirestore.instance.collection('finalorder').doc(email);
 
-        // Store the order details including cart items in the user's document
+        // Add the new order to the 'finalorder' collection with a single 'Items' field and 'Total' field
         await finalOrderDocRef.collection('orders').add({
           'username': userFirstName,
           'email': userEmail,
           'status': 'Order Confirmed',
-          'timestamp': FieldValue.serverTimestamp(),
-          'items': items, // Save cart items in the new order
+          'Timestamp': FieldValue.serverTimestamp(),
+          'Items': items, // Directly store product info in 'Items'
+          'Total': total, // Store the calculated total price
         });
 
-        // Optionally, clear the cart items
+        // Optionally, clear the cart items after placing the order
         for (var doc in ordersQuery.docs) {
           await doc.reference.delete();
         }
@@ -172,7 +188,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         // Fetch and display the most recent order items again
         await _fetchOrderItems();
 
-        // Navigate to DeliveredScreen
+        // Navigate to DeliveredScreen after placing the order
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(

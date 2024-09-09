@@ -143,56 +143,78 @@ class _AddressScreenState extends State<AddressScreen> {
         vertical: 40.0.h, // Adjust vertical padding to move the card down
         horizontal: 16.0.w, // Optional: Horizontal padding for spacing from edges
       ),
-      child: Card(
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(2.0), // Slightly rounded corners
-        ),
-        elevation: 1.5,
-        child: SizedBox(
-          height: 120.h, // Set a fixed height for the Card
-          child: ListView(
-            padding: EdgeInsets.all(12.0.w), // Padding inside the ListView
-            children: [
-              Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch, // Stretch the column to full width
+        children: [
+          Card(
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(2.0), // Slightly rounded corners
+            ),
+            elevation: 1.5,
+            child: SizedBox(
+              height: 120.h, // Set a fixed height for the Card
+              child: ListView(
+                padding: EdgeInsets.all(12.0.w), // Padding inside the ListView
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _addressController.text,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15.sp,
-                            fontFamily: 'Montserrat',
-                          ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _addressController.text,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15.sp,
+                                fontFamily: 'Montserrat',
+                              ),
+                            ),
+                            SizedBox(height: 5.h), // Space between text elements
+                            Text(
+                              _mobileController.text,
+                              style: TextStyle(fontFamily: 'Montserrat'),
+                            ),
+                            Text(
+                              _selectedProvince,
+                              style: TextStyle(fontFamily: 'Montserrat'),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 5.h), // Space between text elements
-                        Text(
-                          _mobileController.text,
-                          style: TextStyle(fontFamily: 'Montserrat'),
-                        ),
-                        Text(
-                          _selectedProvince,
-                          style: TextStyle(fontFamily: 'Montserrat'),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.edit, color: Colors.blueGrey),
-                    onPressed: () {
-                      setState(() {
-                        _isEditing = true; // Toggle to edit mode when the icon is clicked
-                      });
-                    },
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
+          SizedBox(height: 300.h), // Space before the button
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _isEditing = true; // Toggle to edit mode
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFFB3C6D1),
+              padding: EdgeInsets.symmetric(vertical: 12.0.h), // Adjust padding as needed
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(2.0),
+              ),
+              elevation: 1.0,
+            ),
+            child: Text(
+              'Change Address',
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                fontFamily: 'Montserrat',
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -15,7 +15,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     if (user != null) {
       // Fetch orders from the 'orders' subcollection
       final QuerySnapshot ordersSnapshot = await FirebaseFirestore.instance
-          .collection('cartitems')
+          .collection('finalorder')
           .doc(user.email)
           .collection('orders')
           .orderBy('Timestamp', descending: true) // Order by most recent
@@ -207,4 +207,3 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     );
   }
 }
-
