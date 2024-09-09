@@ -13,10 +13,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CartScreen extends StatefulWidget {
+
+
+  final String restaurantName; // Add this line
+
   final cartprovider.CartProvider cartProvider;
   final Cart cart;
 
-  const CartScreen({Key? key, required this.cartProvider, required this.cart})
+  const CartScreen({Key? key, required this.cartProvider, required this.cart, required this.restaurantName})
       : super(key: key);
 
   @override
@@ -327,7 +331,7 @@ class _CartScreenState extends State<CartScreen> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (BuildContext context) => PaymentScreen(),
+                      builder: (BuildContext context) => PaymentScreen(restaurantName: widget.restaurantName,),
                     ),
                   );
                 },

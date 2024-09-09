@@ -41,7 +41,7 @@ class VerticalGridScreen extends StatelessWidget {
                     builder: (context) => ProductViewScreen(
                       title: titles[i],
                       imagePath: imagePaths[i],
-                      products: [], // Pass the related products (replace with actual data)
+                      products: [], restaurantName: '', // Pass the related products (replace with actual data)
                     ),
                   ),
                 );

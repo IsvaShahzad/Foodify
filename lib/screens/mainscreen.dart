@@ -187,7 +187,7 @@ class _MainScreenState extends State<MainScreen> {
                       builder: (context) => CartScreen(
                         cart: Provider.of<Cart>(context, listen: false),
                         cartProvider:
-                            Provider.of<CartProvider>(context, listen: false),
+                            Provider.of<CartProvider>(context, listen: false), restaurantName: '',
                       ),
                     ),
                   );
@@ -272,6 +272,7 @@ class _MainScreenState extends State<MainScreen> {
                                             imagePath: filteredImagePaths[i] ??
                                                 '', // Use the correct index to get a single image path
                                             products: products[title] ?? [],
+                                            restaurantName: '',
                                           ),
                                         ),
                                       );
@@ -341,6 +342,7 @@ class _MainScreenState extends State<MainScreen> {
                                                               '',
                                                       products:
                                                           products[title] ?? [],
+                                                      restaurantName: '',
                                                     ),
                                                   ),
                                                 );
@@ -668,8 +670,11 @@ class _MainScreenState extends State<MainScreen> {
                                             i], // Pass the title for the new screen
                                         imagePath: imagePathsHotDeals[
                                             i], // Pass the image path for the new screen
-                                        products: products[titlesHotDeals[i]] ??
-                                            [], // Pass the products related to the title
+                                        products:
+                                            products[titlesHotDeals[i]] ?? [],
+                                        restaurantName: titlesMain[
+                                            i], // Pass the restaurant name here
+// Pass the products related to the title
                                       ),
                                     ),
                                   );
@@ -717,7 +722,10 @@ class _MainScreenState extends State<MainScreen> {
                                                       i], // Pass the specific image path
                                                   products: products[
                                                           titlesHotDeals[i]] ??
-                                                      [], // Pass the related products
+                                                      [],
+                                                  restaurantName: titlesMain[
+                                                      i], // Pass the restaurant name here
+// Pass the related products
                                                 ),
                                               ),
                                             );
@@ -905,9 +913,11 @@ class _MainScreenState extends State<MainScreen> {
                                             i], // Pass the title for the new screen
                                         imagePath: imagepathDesiDesire[
                                             i], // Pass the image path for the new screen
-                                        products: products[
-                                                titleDesiDesire[i]] ??
-                                            [], // Pass the products related to the title
+                                        products:
+                                            products[titleDesiDesire[i]] ?? [],
+                                        restaurantName: titlesMain[
+                                            i], // Pass the restaurant name here
+// Pass the products related to the title
                                       ),
                                     ),
                                   );
@@ -955,7 +965,10 @@ class _MainScreenState extends State<MainScreen> {
                                                       i], // Pass the specific image path
                                                   products: products[
                                                           titleDesiDesire[i]] ??
-                                                      [], // Pass the related products
+                                                      [],
+                                                  restaurantName: titlesMain[
+                                                      i], // Pass the restaurant name here
+// Pass the related products
                                                 ),
                                               ),
                                             );
@@ -1114,8 +1127,10 @@ class _MainScreenState extends State<MainScreen> {
                                           i], // Pass the title for the new screen
                                       imagePath: imagePathsAllRestaurant[
                                           i], // Pass the image path for the new screen
-                                      products: products[titlesMain[i]] ??
-                                          [], // Pass the products related to the title
+                                      products: products[titlesMain[i]] ?? [],
+                                      restaurantName: titlesMain[
+                                          i], // Pass the restaurant name here
+// Pass the products related to the title
                                     ),
                                   ),
                                 );
@@ -1160,9 +1175,12 @@ class _MainScreenState extends State<MainScreen> {
                                                 title: titlesMain[i],
                                                 imagePath: imagePathsAllRestaurant[
                                                     i], // Pass the specific image path
-                                                products: products[
-                                                        titlesMain[i]] ??
-                                                    [], // Pass the related products
+                                                products:
+                                                    products[titlesMain[i]] ??
+                                                        [],
+                                                restaurantName: titlesMain[
+                                                    i], // Pass the restaurant name here
+// Pass the related products
                                               ),
                                             ),
                                           );

@@ -1,8 +1,11 @@
+// order_history_screen.dart
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shop/screens/mainscreen.dart';
+import '../widgets/review_widget.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
   @override
@@ -13,15 +16,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   Future<List<Map<String, dynamic>>> _fetchOrderHistory() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      // Fetch orders from the 'orders' subcollection
       final QuerySnapshot ordersSnapshot = await FirebaseFirestore.instance
           .collection('finalorder')
           .doc(user.email)
           .collection('orders')
-          .orderBy('Timestamp', descending: true) // Order by most recent
+          .orderBy('Timestamp', descending: true)
           .get();
 
-      // Convert the snapshot into a list of maps
       return ordersSnapshot.docs.map((doc) {
         return doc.data() as Map<String, dynamic>;
       }).toList();
@@ -65,6 +66,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 final formattedTime = timestamp is Timestamp
                     ? DateFormat('dd-MM-yyyy, hh:mm a').format(timestamp.toDate())
                     : 'N/A';
+                final restaurantName = orderDetails['restaurantName'] ?? 'Unknown Restaurant';
+
 
                 return Card(
                   color: Colors.white,
@@ -86,6 +89,24 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                           ),
                         ),
                         Divider(color: Colors.grey[300], height: 24),
+
+                        Text(
+                          'Restaurant',
+                          style: TextStyle(
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+
+                        SizedBox(height: 4),
+                        Text(
+                          restaurantName,
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            color: Colors.grey[700],
+                          ),
+                        ),
                         Text(
                           'Items:',
                           style: TextStyle(
@@ -194,6 +215,20 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                               ),
                             ),
                           ],
+                        ),
+                        SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ReviewScreen(
+                                  orderId: orderDetails['orderId'] ?? 'Unknown Order ID', // Pass order ID
+                                ),
+                              ),
+                            );
+                          },
+                          child: Text('Leave a Review'),
                         ),
                       ],
                     ),

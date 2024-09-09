@@ -17,6 +17,7 @@ class ProductDetailScreen extends StatefulWidget {
   final String productDescription;
   final String ImageURL;
   final String companyName;
+  final String restaurantName; // Add this line
 
   const ProductDetailScreen({
     Key? key,
@@ -26,6 +27,7 @@ class ProductDetailScreen extends StatefulWidget {
     required this.productDescription,
     required this.ImageURL,
     required this.companyName,
+    required this.restaurantName
   }) : super(key: key);
 
   @override
@@ -74,7 +76,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   builder: (context) => CartScreen(
                     cart: Provider.of<cartt.Cart>(context, listen: false),
                     cartProvider:
-                        Provider.of<CartProvider>(context, listen: false),
+                        Provider.of<CartProvider>(context, listen: false), restaurantName: '',
                   ),
                 ),
               );
@@ -194,7 +196,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                             listen: false),
                                         cartProvider: Provider.of<CartProvider>(
                                             context,
-                                            listen: false),
+                                            listen: false), restaurantName: widget.restaurantName,
                                       ),
                                     ),
                                   );

@@ -6,11 +6,13 @@ class ProductViewScreen extends StatefulWidget {
   final String title;
   final String imagePath; // Can be a network URL or asset path
   final List<Map<String, dynamic>> products;
+  final String restaurantName; // Add this line
 
   ProductViewScreen({
     required this.title,
     required this.imagePath,
     required this.products,
+    required this.restaurantName, // Add this line
   });
 
   @override
@@ -35,33 +37,27 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.restaurantName), // Display the restaurant name here
+        backgroundColor: Colors.teal, // You can customize the color as needed
+        elevation: 0, // Optional: Remove shadow if you don't want an elevation
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          Stack(
-            children: [
-              Container(
-                width: double.infinity,
-                height: 300,
-                child: Image(
-                  image: _getImageProvider(widget.imagePath), // Use the updated method
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Positioned(
-                top: 18,
-                left: 5,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: Colors.grey[100],
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ),
-            ],
+          Container(
+            width: double.infinity,
+            height: 300,
+            child: Image(
+              image: _getImageProvider(widget.imagePath), // Use the updated method
+              fit: BoxFit.cover,
+            ),
           ),
           Expanded(
             child: ListView.builder(
@@ -106,7 +102,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
               id: productId,
               productPrice: productPrice,
               ImageURL: productImage,
-              companyName: companyName,
+              companyName: companyName, restaurantName: widget.restaurantName,
             ),
           ),
         );
@@ -174,3 +170,4 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
     );
   }
 }
+

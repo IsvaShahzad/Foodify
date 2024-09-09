@@ -8,6 +8,12 @@ import '../widgets/progressbar_shipping.dart';
 import 'delivered_screen.dart';
 
 class PaymentScreen extends StatefulWidget {
+  final String restaurantName; // Add this line
+
+  PaymentScreen({
+    required this.restaurantName, // Add this line
+  });
+
   @override
   _PaymentScreenState createState() => _PaymentScreenState();
 }
@@ -134,16 +140,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
     } else {
       try {
         // Get the current user's email
-        final email = FirebaseAuth.instance.currentUser?.email ?? 'unknown@example.com';
+        final email =
+            FirebaseAuth.instance.currentUser?.email ?? 'unknown@example.com';
 
         // Reference to the user's document in the 'cartitems' collection
-        final userDocRef = FirebaseFirestore.instance.collection('cartitems').doc(email);
+        final userDocRef =
+            FirebaseFirestore.instance.collection('cartitems').doc(email);
 
         // Reference to the 'orders' subcollection for the user
         final ordersCollectionRef = userDocRef.collection('orders');
 
         // Fetch the most recent order document
-        final ordersQuery = await ordersCollectionRef.orderBy('Timestamp', descending: true).limit(1).get();
+        final ordersQuery = await ordersCollectionRef
+            .orderBy('Timestamp', descending: true)
+            .limit(1)
+            .get();
 
         List<Map<String, dynamic>> items = [];
 
@@ -152,7 +163,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
           final orderData = doc.data();
           if (orderData != null && orderData.containsKey('Items')) {
             // Fetch the product information directly from 'Items' and store it in the items list
-            final List<Map<String, dynamic>> fetchedItems = List<Map<String, dynamic>>.from(orderData['Items']);
+            final List<Map<String, dynamic>> fetchedItems =
+                List<Map<String, dynamic>>.from(orderData['Items']);
             items.addAll(fetchedItems);
           }
         }
@@ -168,7 +180,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
         total += 100; // Add 100 only once to the total
 
         // Reference to the user's document in the 'finalorder' collection
-        final finalOrderDocRef = FirebaseFirestore.instance.collection('finalorder').doc(email);
+        final finalOrderDocRef =
+            FirebaseFirestore.instance.collection('finalorder').doc(email);
 
         // Add the new order to the 'finalorder' collection with a single 'Items' field and 'Total' field
         await finalOrderDocRef.collection('orders').add({
@@ -176,6 +189,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
           'email': userEmail,
           'status': 'Order Confirmed',
           'Timestamp': FieldValue.serverTimestamp(),
+          'restaurantName':
+              widget.restaurantName, // Save the restaurant name here
           'Items': items, // Directly store product info in 'Items'
           'Total': total, // Store the calculated total price
         });
@@ -207,7 +222,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView( // Make the screen scrollable
+      body: SingleChildScrollView(
+        // Make the screen scrollable
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -271,7 +287,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   ),
                   Divider(),
                   ListTile(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 6),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 8.0, vertical: 6),
                     leading: Checkbox(
                       value: isCheckboxChecked,
                       onChanged: (value) {
@@ -315,13 +332,27 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       ),
                     ),
                   ),
+
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    child: Text(
+                      'Restaurant: ${widget.restaurantName}', // Display the restaurant name
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.045,
+                        fontFamily: 'Montserrat',
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
                   Divider(),
                   ...orderItems.map((order) {
-                    final items = List<Map<String, dynamic>>.from(order['Items'] ?? []);
+                    final items =
+                        List<Map<String, dynamic>>.from(order['Items'] ?? []);
                     return Column(
                       children: items.map((item) {
                         return ListTile(
-                          contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 6),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 8.0, vertical: 6),
                           leading: Image.network(
                             item['Image URL'] ?? '', // Provide a default value
                             width: 50,
@@ -330,7 +361,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           ),
                           title: Text(item['Item Name'] ?? 'Unknown Item'),
                           subtitle: Text('Quantity: ${item['Quantity'] ?? 0}'),
-                          trailing: Text('Rs. ${item['Price']?.toStringAsFixed(2) ?? '0.00'}'),
+                          trailing: Text(
+                              'Rs. ${item['Price']?.toStringAsFixed(2) ?? '0.00'}'),
                         );
                       }).toList(),
                     );
